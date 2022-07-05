@@ -57,6 +57,7 @@ model ReUp {
   title     String        @db.VarChar(255)
   from      String?       @db.VarChar(255)
   date      DateTime
+  total     Float?        @db.DoublePrecision
   thoughts  String        @db.Text
   user      String        @db.VarChar(255)
   products  ReUpProduct[]

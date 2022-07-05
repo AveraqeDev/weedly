@@ -1,17 +1,27 @@
-import { UserProfile, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import {
+  getSession,
+  UserProfile,
+  withPageAuthRequired,
+} from "@auth0/nextjs-auth0";
 import { PlusIcon } from "@heroicons/react/outline";
+import { Product, ReUp, ReUpUpdate } from "@prisma/client";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
-import Card from "../components/Card";
-import ReUp from "../interfaces/ReUp";
+import ReUpCard from "../components/ReUpCard";
+import { prisma } from "../server/db";
+
+type CustomReUp = ReUp & {
+  products: Product[];
+  updates: ReUpUpdate[];
+};
 
 type HomeProps = {
   user: UserProfile;
-  reUps: ReUp[];
+  reUps: CustomReUp[];
 };
 
-const Home: NextPage<HomeProps> = ({ user, reUps }) => {
+const Home: NextPage<HomeProps> = ({ reUps }) => {
   const [formOpen, setFormOpen] = useState(false);
 
   return (
@@ -65,9 +75,7 @@ const Home: NextPage<HomeProps> = ({ user, reUps }) => {
             </button>
           </div>
           {reUps.map((reUp) => (
-            <Card key={reUp.id} header={reUp.title}>
-              <div>Content</div>
-            </Card>
+            <ReUpCard key={reUp.id} reUp={reUp} />
           ))}
         </div>
       )}
@@ -76,26 +84,20 @@ const Home: NextPage<HomeProps> = ({ user, reUps }) => {
 };
 
 export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(_context: GetServerSidePropsContext) {
-    const reUps: ReUp[] = [
-      {
-        id: 1,
-        title: "Dank ReUp",
-        date: "2022-07-01",
-        products: [],
-        thoughts: "Excited to try",
+  async getServerSideProps(ctx: GetServerSidePropsContext) {
+    const session = getSession(ctx.req, ctx.res);
+    const reUps = await prisma.reUp.findMany({
+      where: {
+        user: session?.user.email,
       },
-      {
-        id: 2,
-        title: "Dank ReUp #2",
-        date: "2022-07-01",
-        products: [],
-        thoughts: "Excited to try",
+      include: {
+        products: true,
+        updates: true,
       },
-    ];
+    });
     return {
       props: {
-        reUps: reUps,
+        reUps: JSON.parse(JSON.stringify(reUps)),
       },
     };
   },

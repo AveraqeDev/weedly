@@ -10,12 +10,15 @@ import SearchInput from "./form/SearchInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
 import { parseDateString } from "../utils/date";
+import { ReUp } from "@prisma/client";
+import { isErrorResponse, JsonResponse } from "../interfaces/Response";
+import { useRouter } from "next/router";
 
 class FormData {
   date: string = "";
   title: string = "";
   from: string = "";
-  total: string = "";
+  total: number = 0.0;
   products: { value: string | number; label: string; extra?: string }[] = [];
   thoughts: string = "";
 }
@@ -28,12 +31,11 @@ const schema = yup.object({
     .typeError("Invalid date")
     .required("Date is a required field"),
   title: yup.string().required("Title is a required field"),
-  from: yup.string().required("From is a required field"),
+  from: yup.string(),
   total: yup
     .number()
     .positive("Total Spent must be a positive number")
-    .typeError("Invalid number")
-    .required("Total Spent is a required field"),
+    .typeError("Invalid number"),
   products: yup.array().of(
     yup.object({
       value: yup.number().positive().required(),
@@ -43,6 +45,18 @@ const schema = yup.object({
   ),
   thoughts: yup.string().optional(),
 });
+
+const formToApi = (data: FormData) => {
+  const reUp = {
+    date: new Date(data.date),
+    title: data.title,
+    from: data.from || null,
+    total: data.total || null,
+    thoughts: data.thoughts,
+    products: data.products.map((product) => product.value),
+  };
+  return reUp;
+};
 
 type AddReUpFormProps = {
   open: boolean;
@@ -60,14 +74,29 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
     defaultValues: new FormData(),
     resolver: yupResolver(schema),
   });
+  const router = useRouter();
 
   const cancelButtonRef = useRef(null);
 
-  const save: SubmitHandler<FormData> = (data) => {
-    // TODO: Make API Request
-    console.log(data);
+  const save: SubmitHandler<FormData> = async (data: FormData) => {
+    const resp = await fetch("/api/reups", {
+      method: "POST",
+      body: JSON.stringify(formToApi(data)),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const respData: JsonResponse<ReUp> = await resp.json();
+    if (isErrorResponse(respData.status, respData.data)) {
+      console.error(respData.data.message);
+      // TODO: Toast/Notification of error
+    } else {
+      // TODO: Toast/Notification of success
+      console.log("Success!");
+    }
     setOpen(false);
     reset(new FormData());
+    router.reload();
   };
 
   const cancel = () => {

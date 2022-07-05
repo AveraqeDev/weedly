@@ -15,10 +15,9 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { useUser } from "@auth0/nextjs-auth0";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { useRouter } from "next/router";
 import { classNames, getUserInitials } from "../utils/string";
-import { useEffect } from "react";
 
 type HeaderProps = {};
 
@@ -26,15 +25,9 @@ const Header: React.FC<HeaderProps> = () => {
   const { user, isLoading } = useUser();
   const router = useRouter();
 
-  const [formOpen, setFormOpen] = useState(false);
-
   const currentRoute = router.asPath;
 
   const noUser = !user && !isLoading;
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   const navigation = noUser
     ? [{ name: "Home", href: "/", icon: HomeIcon }]

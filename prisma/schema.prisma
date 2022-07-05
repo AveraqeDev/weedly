@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ProductTag {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique @db.VarChar(255)
+  color    String?   @db.VarChar(255)
+  products Product[]
+}
+
+enum ProductType {
+  PRE_ROLL
+  FLOWER
+  CONCENTRATE
+  MOON_ROCKS
+  OTHER
+}
+
+model Product {
+  id            Int                   @id @default(autoincrement())
+  name          String                @db.VarChar(255)
+  brand         String                @db.VarChar(255)
+  description   String?               @db.Text
+  type          ProductType           @default(FLOWER)
+  price         Float                 @db.DoublePrecision
+  tags          ProductTag[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  reUps         ReUpProduct[]
+  reviews       ProductReview[]
+  userFavorites UserProductFavorite[]
+  userDisliked  UserProductDislike[]
+}
+
+model ProductReview {
+  id        Int      @id @default(autoincrement())
+  review    String   @db.Text
+  rating    Int
+  user      String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReUp {
+  id        Int           @id @default(autoincrement())
+  title     String        @db.VarChar(255)
+  from      String?       @db.VarChar(255)
+  date      DateTime
+  thoughts  String        @db.Text
+  user      String        @db.VarChar(255)
+  products  ReUpProduct[]
+  updates   ReUpUpdate[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ReUpProduct {
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  reUp      ReUp     @relation(fields: [reUpId], references: [id])
+  reUpId    Int
+  addedAt   DateTime @default(now())
+
+  @@id([productId, reUpId])
+}
+
+model ReUpUpdate {
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
+  reUp      ReUp     @relation(fields: [reUpId], references: [id])
+  reUpId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserProductFavorite {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      String
+  addedAt   DateTime @default(now())
+}
+
+model UserProductDislike {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      String
+  addedAt   DateTime @default(now())
+}

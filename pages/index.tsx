@@ -1,22 +1,24 @@
+import { UserProfile, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PlusIcon } from "@heroicons/react/outline";
-import type { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import { useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import Card from "../components/Card";
 import ReUp from "../interfaces/ReUp";
 
 type HomeProps = {
+  user: UserProfile;
   reUps: ReUp[];
 };
 
-const Home = ({ reUps }: HomeProps) => {
+const Home: NextPage<HomeProps> = ({ user, reUps }) => {
   const [formOpen, setFormOpen] = useState(false);
 
   return (
     <>
       <AddReUpForm open={formOpen} setOpen={setFormOpen} />
-      {reUps.length < 1 && (
-        <div className="w-1/3 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">
+      {reUps.length < 1 ? (
+        <div className="w-1/3 sm:w-1/2 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             fill="none"
@@ -39,7 +41,7 @@ const Home = ({ reUps }: HomeProps) => {
           <div className="mt-6">
             <button
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-600 bg-lime-400 hover:bg-lime-300 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-500 hover:bg-lime-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
               onClick={() => setFormOpen(true)}
             >
               <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -47,55 +49,56 @@ const Home = ({ reUps }: HomeProps) => {
             </button>
           </div>
         </div>
-      )}
-      <div className="lg:w-2/3 md:w-3/4 mx-auto flex flex-col gap-10">
-        <div className="flex justify-between mt-10">
-          <h2 className="text-2xl font-semibold text-gray-600 border-b-2 border-lime-500 pr-5">
-            ReUps
-          </h2>
-          <button
-            type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-600 bg-lime-400 hover:bg-lime-300 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
-            onClick={() => setFormOpen(true)}
-          >
-            <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Add ReUp
-          </button>
+      ) : (
+        <div className="lg:w-2/3 md:w-3/4 w-full px-6 md:px-0 md:mx-auto flex flex-col gap-10">
+          <div className="flex justify-between mt-10">
+            <h2 className="text-2xl font-semibold text-gray-600 border-b-2 border-lime-500 pr-5">
+              ReUps
+            </h2>
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-500 hover:bg-lime-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
+              onClick={() => setFormOpen(true)}
+            >
+              <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              New ReUp
+            </button>
+          </div>
+          {reUps.map((reUp) => (
+            <Card key={reUp.id} header={reUp.title}>
+              <div>Content</div>
+            </Card>
+          ))}
         </div>
-        {reUps.map((reUp) => (
-          <Card key={reUp.id} header={reUp.title}>
-            <div>Content</div>
-          </Card>
-        ))}
-      </div>
+      )}
     </>
   );
 };
 
-export const getServerSideProps = async (
-  _context: GetServerSidePropsContext
-) => {
-  const reUps: ReUp[] = [
-    {
-      id: 1,
-      title: "Dank ReUp",
-      date: "2022-07-01",
-      products: [],
-      thoughts: "Excited to try",
-    },
-    {
-      id: 2,
-      title: "Dank ReUp #2",
-      date: "2022-07-01",
-      products: [],
-      thoughts: "Excited to try",
-    },
-  ];
-  return {
-    props: {
-      reUps: reUps,
-    },
-  };
-};
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(_context: GetServerSidePropsContext) {
+    const reUps: ReUp[] = [
+      {
+        id: 1,
+        title: "Dank ReUp",
+        date: "2022-07-01",
+        products: [],
+        thoughts: "Excited to try",
+      },
+      {
+        id: 2,
+        title: "Dank ReUp #2",
+        date: "2022-07-01",
+        products: [],
+        thoughts: "Excited to try",
+      },
+    ];
+    return {
+      props: {
+        reUps: reUps,
+      },
+    };
+  },
+});
 
 export default Home;

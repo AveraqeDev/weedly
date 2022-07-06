@@ -10,16 +10,20 @@ import SearchInput from "./form/SearchInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
 import { parseDateString } from "../utils/date";
-import { ReUp } from "@prisma/client";
-import { isErrorResponse, JsonResponse } from "../interfaces/Response";
 import { useRouter } from "next/router";
+
+type ProductOption = {
+  value: string | number;
+  label: string;
+  extra?: string;
+};
 
 class FormData {
   date: string = "";
   title: string = "";
   from: string = "";
   total: number = 0.0;
-  products: { value: string | number; label: string; extra?: string }[] = [];
+  products: ProductOption[] = [];
   thoughts: string = "";
 }
 
@@ -78,22 +82,16 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
 
   const cancelButtonRef = useRef(null);
 
+  const products: any[] = [];
+
+  const productOptions: ProductOption[] = products.map((product) => ({
+    value: product.id,
+    label: product.name,
+    extra: product.brand,
+  }));
+
   const save: SubmitHandler<FormData> = async (data: FormData) => {
-    const resp = await fetch("/api/reups", {
-      method: "POST",
-      body: JSON.stringify(formToApi(data)),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const respData: JsonResponse<ReUp> = await resp.json();
-    if (isErrorResponse(respData.status, respData.data)) {
-      console.error(respData.data.message);
-      // TODO: Toast/Notification of error
-    } else {
-      // TODO: Toast/Notification of success
-      console.log("Success!");
-    }
+    console.log(data);
     setOpen(false);
     reset(new FormData());
     router.reload();
@@ -194,10 +192,7 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
                         <SearchInput<FormData>
                           name="products"
                           label="Products"
-                          options={[
-                            { value: 1, label: "Dank Weed", extra: "Flower" },
-                            { value: 2, label: "Dank Wax" },
-                          ]}
+                          options={productOptions}
                           defaultValue={[]}
                           placeholder="Products Purchased..."
                           multiple

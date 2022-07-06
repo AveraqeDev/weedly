@@ -1,28 +1,14 @@
-import {
-  getSession,
-  UserProfile,
-  withPageAuthRequired,
-} from "@auth0/nextjs-auth0";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PlusIcon } from "@heroicons/react/outline";
-import { Product, ReUp, ReUpUpdate } from "@prisma/client";
-import type { GetServerSidePropsContext, NextPage } from "next";
+import type { NextPage } from "next";
 import { useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import ReUpCard from "../components/ReUpCard";
-import { prisma } from "../server/db";
 
-type CustomReUp = ReUp & {
-  products: Product[];
-  updates: ReUpUpdate[];
-};
-
-type HomeProps = {
-  user: UserProfile;
-  reUps: CustomReUp[];
-};
-
-const Home: NextPage<HomeProps> = ({ reUps }) => {
+const Home: NextPage = withPageAuthRequired(() => {
   const [formOpen, setFormOpen] = useState(false);
+
+  const reUps: any[] = [];
 
   return (
     <>
@@ -81,26 +67,6 @@ const Home: NextPage<HomeProps> = ({ reUps }) => {
       )}
     </>
   );
-};
-
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(ctx: GetServerSidePropsContext) {
-    const session = getSession(ctx.req, ctx.res);
-    const reUps = await prisma.reUp.findMany({
-      where: {
-        user: session?.user.email,
-      },
-      include: {
-        products: true,
-        updates: true,
-      },
-    });
-    return {
-      props: {
-        reUps: JSON.parse(JSON.stringify(reUps)),
-      },
-    };
-  },
 });
 
 export default Home;

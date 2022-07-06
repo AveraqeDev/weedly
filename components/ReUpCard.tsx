@@ -1,18 +1,32 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import { Disclosure } from "@headlessui/react";
-import { ChevronUpIcon, ClockIcon, MinusIcon } from "@heroicons/react/outline";
-import { ReUp, ReUpUpdate, Product } from "@prisma/client";
+import {
+  ChevronUpIcon,
+  ClockIcon,
+  DotsHorizontalIcon,
+  HeartIcon,
+  MinusCircleIcon,
+  MinusIcon,
+  PlusIcon,
+  StarIcon,
+  ThumbDownIcon,
+} from "@heroicons/react/outline";
+import { ReUp, ReUpUpdate, Product, ProductTag } from "@prisma/client";
 import Image from "next/image";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
 import Card from "./Card";
 
 type ReUpCardProps = {
-  reUp: ReUp & { products: Product[]; updates: ReUpUpdate[] };
+  reUp: ReUp & {
+    products: { product: Product & { tags: ProductTag[] } }[];
+    updates: ReUpUpdate[];
+  };
 };
 
 const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
   const { user } = useUser();
+
   return (
     <Card
       key={reUp.id}
@@ -69,14 +83,22 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                   <span className="text-sm font-medium text-gray-500">
                     Products
                   </span>
-                  <Disclosure.Button className="group rounded-full p-2 hover:bg-lime-500 hover:text-white focus:outline-none">
-                    <ChevronUpIcon
-                      className={classNames(
-                        open ? "rotate-180 transform" : "",
-                        "h-5 w-5 text-gray-500 group-hover:text-white"
-                      )}
-                    />
-                  </Disclosure.Button>
+                  <div className="flex items-center gap-2">
+                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                      <ChevronUpIcon
+                        className={classNames(
+                          open ? "rotate-180 transform" : "",
+                          "h-5 w-5 text-gray-500 group-hover:text-white"
+                        )}
+                      />
+                    </Disclosure.Button>
+                    <button className="group bg-lime-500 h-7 w-7 rounded-full ring-6 ring-white hover:bg-lime-400">
+                      <PlusIcon
+                        className="h-5 w-5 text-white group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
                 </div>
                 <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm">
                   <dd className="flow-root mt-1 text-sm text-gray-900">
@@ -90,7 +112,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                         </div>
                       )}
                       {reUp.products.map((product, idx) => (
-                        <li key={product.id}>
+                        <li key={product.product.id}>
                           <div className="relative pb-8">
                             {idx !== reUp.products.length - 1 ? (
                               <span
@@ -98,21 +120,74 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                 aria-hidden="true"
                               />
                             ) : null}
-                            <div className="relative flex space-x-3">
-                              <span className="bg-lime-500 h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white">
-                                <ClockIcon
-                                  className="h-5 w-5 text-white"
-                                  aria-hidden="true"
-                                />
-                              </span>
+                            <div className="flex space-x-3 items-center">
+                              <Disclosure>
+                                {({ open }) => (
+                                  <div className="relative">
+                                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                                      <DotsHorizontalIcon
+                                        className={classNames(
+                                          open ? "rotate-180 transform" : "",
+                                          "h-5 w-5 text-gray-500 group-hover:text-white"
+                                        )}
+                                      />
+                                    </Disclosure.Button>
+                                    <Disclosure.Panel className="origin-top-left absolute left-0">
+                                      <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
+                                        <button className="group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500">
+                                          <MinusCircleIcon
+                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                          <span>Remove</span>
+                                        </button>
+                                        <button className="group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500">
+                                          <StarIcon
+                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                          <span>Rate</span>
+                                        </button>
+                                        <button className="group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500">
+                                          <HeartIcon
+                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                          <span>Favorite</span>
+                                        </button>
+                                        <button className="group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500">
+                                          <ThumbDownIcon
+                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                          <span>Dislike</span>
+                                        </button>
+                                      </div>
+                                    </Disclosure.Panel>
+                                  </div>
+                                )}
+                              </Disclosure>
                               <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                <div>
+                                <div className="flex flex-col w-2/3">
                                   <p className="text-sm text-gray-500">
-                                    {product.name}
+                                    {product.product.name}
                                   </p>
+                                  <span className="text-xs text-gray-400">
+                                    {product.product.brand}
+                                  </span>
                                 </div>
-                                <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                                  <span>{product.brand}</span>
+                                <div className="flex justify-end items-center flex-wrap gap-2">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    {product.product.type}
+                                  </span>
+                                  {product.product.tags.map((tag) => (
+                                    <span
+                                      key={tag.id}
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${tag.color}-500 text-white`}
+                                    >
+                                      {tag.name}
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
                             </div>
@@ -134,14 +209,22 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                   <span className="text-sm font-medium text-gray-500">
                     Updates
                   </span>
-                  <Disclosure.Button className="group rounded-full p-2 hover:bg-lime-500 hover:text-white focus:outline-none">
-                    <ChevronUpIcon
-                      className={classNames(
-                        open ? "rotate-180 transform" : "",
-                        "h-5 w-5 text-gray-500 group-hover:text-white"
-                      )}
-                    />
-                  </Disclosure.Button>
+                  <div className="flex items-center gap-2">
+                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                      <ChevronUpIcon
+                        className={classNames(
+                          open ? "rotate-180 transform" : "",
+                          "h-5 w-5 text-gray-500 group-hover:text-white"
+                        )}
+                      />
+                    </Disclosure.Button>
+                    <button className="group bg-lime-500 h-7 w-7 rounded-full flex items-center justify-center ring-6 ring-white hover:bg-lime-400">
+                      <PlusIcon
+                        className="h-5 w-5 text-white group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
                 </div>
                 <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm">
                   <dd className="flow-root mt-1 text-sm text-gray-900">

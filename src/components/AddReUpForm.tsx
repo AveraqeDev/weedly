@@ -2,8 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { CalendarIcon, DocumentAddIcon } from "@heroicons/react/outline";
 import React, { Fragment, useRef } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import PriceInput from "./form/PriceInput";
 import SearchInput from "./form/SearchInput";
@@ -11,9 +10,14 @@ import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
 import { parseDateString } from "../utils/date";
 import { useRouter } from "next/router";
+import {
+  CreateReUpInputType,
+  createReUpValidator,
+} from "../shared/create-reup-validator";
+import { trpc } from "../utils/trpc";
 
 type ProductOption = {
-  value: string | number;
+  value: number;
   label: string;
   extra?: string;
 };
@@ -21,43 +25,20 @@ type ProductOption = {
 class FormData {
   date: string = "";
   title: string = "";
-  from: string = "";
-  total: number = 0.0;
+  from?: string;
+  total?: number;
   products: ProductOption[] = [];
   thoughts: string = "";
 }
 
-const schema = yup.object({
-  date: yup
-    .date()
-    .transform(parseDateString)
-    .max(new Date())
-    .typeError("Invalid date")
-    .required("Date is a required field"),
-  title: yup.string().required("Title is a required field"),
-  from: yup.string(),
-  total: yup
-    .number()
-    .positive("Total Spent must be a positive number")
-    .typeError("Invalid number"),
-  products: yup.array().of(
-    yup.object({
-      value: yup.number().positive().required(),
-      label: yup.string().required(),
-      extra: yup.string().optional(),
-    })
-  ),
-  thoughts: yup.string().optional(),
-});
-
 const formToApi = (data: FormData) => {
-  const reUp = {
+  const reUp: CreateReUpInputType = {
     date: new Date(data.date),
     title: data.title,
-    from: data.from || null,
-    total: data.total || null,
+    from: data.from ?? undefined,
+    total: data.total ?? undefined,
     thoughts: data.thoughts,
-    products: data.products.map((product) => product.value),
+    products: data.products.map((product) => product.value) ?? undefined,
   };
   return reUp;
 };
@@ -76,9 +57,17 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: new FormData(),
-    resolver: yupResolver(schema),
+    resolver: zodResolver(createReUpValidator),
   });
   const router = useRouter();
+
+  const { mutate, isLoading, data } = trpc.useMutation("reups.create", {
+    onSuccess: (data) => {
+      setOpen(false);
+      reset(new FormData());
+      router.reload();
+    },
+  });
 
   const cancelButtonRef = useRef(null);
 
@@ -91,10 +80,7 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
   }));
 
   const save: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data);
-    setOpen(false);
-    reset(new FormData());
-    router.reload();
+    mutate(formToApi(data));
   };
 
   const cancel = () => {
@@ -216,15 +202,17 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
+                    disabled={true}
                     type="button"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-lime-400 text-base font-medium text-gray-600 hover:bg-lime-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-lime-400 text-base font-medium text-gray-600 hover:bg-lime-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-lime-400"
                     onClick={handleSubmit(save)}
                   >
-                    Add
+                    {true ? "Loading..." : "Add"}
                   </button>
                   <button
+                    disabled={true}
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:mt-0 sm:w-auto sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-white"
                     onClick={cancel}
                     ref={cancelButtonRef}
                   >

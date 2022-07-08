@@ -3,6 +3,12 @@ import { createReUpValidator } from "../../shared/create-reup-validator";
 import { prisma } from "../db";
 import { createRouter } from "./context";
 
+type ProductOption = {
+  value: number;
+  label: string;
+  extra?: string;
+};
+
 export const reUpRouter = createRouter()
   .query("list", {
     async resolve({ ctx }) {
@@ -80,7 +86,7 @@ export const reUpRouter = createRouter()
     input: createReUpValidator,
     async resolve({ input, ctx }) {
       if (!ctx.user) throw new Error("Unauthorized");
-      const products = input.products ?? [];
+      const products: ProductOption[] = input.products ?? [];
       return await prisma.reUp.create({
         data: {
           user: ctx.user.email,
@@ -90,7 +96,9 @@ export const reUpRouter = createRouter()
           total: input.total,
           thoughts: input.thoughts ?? "",
           products: {
-            create: products.map((productId) => ({ productId })),
+            create: products.map((product: ProductOption) => ({
+              productId: product.value,
+            })),
           },
         },
       });

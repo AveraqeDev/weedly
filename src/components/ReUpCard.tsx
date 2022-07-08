@@ -126,7 +126,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                           <div className="relative pb-8">
                             {idx !== reUp.products.length - 1 ? (
                               <span
-                                className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                                className="absolute top-10 mt-0.5 left-3.5 -mx-px h-2/3 w-0.5 bg-gray-200"
                                 aria-hidden="true"
                               />
                             ) : null}
@@ -142,7 +142,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                         )}
                                       />
                                     </Disclosure.Button>
-                                    <Disclosure.Panel className="origin-top-left absolute left-0">
+                                    <Disclosure.Panel className="origin-top-left absolute left-0 z-10">
                                       <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
                                         <button className="group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500">
                                           <MinusCircleIcon

@@ -15,7 +15,15 @@ export const createReUpValidator = z.object({
   from: z.string().min(5).max(255).optional(),
   total: priceSchema.optional(),
   thoughts: z.string().min(5).max(1000).optional(),
-  products: z.array(z.number().min(1)).optional(),
+  products: z
+    .array(
+      z.object({
+        value: z.number().min(1),
+        label: z.string(),
+        extra: z.string().optional(),
+      })
+    )
+    .optional(),
 });
 
 export type CreateReUpInputType = z.infer<typeof createReUpValidator>;

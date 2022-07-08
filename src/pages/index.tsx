@@ -12,10 +12,6 @@ const Home: NextPage = withPageAuthRequired(() => {
 
   const { data: reUps, isLoading } = trpc.useQuery(["reups.list"]);
 
-  useEffect(() => {
-    console.log(reUps);
-  }, [reUps]);
-
   if (isLoading) {
     return <Spinner />;
   }

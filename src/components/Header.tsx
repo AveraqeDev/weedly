@@ -18,6 +18,7 @@ import { useUser } from "@auth0/nextjs-auth0";
 import { Fragment } from "react";
 import { useRouter } from "next/router";
 import { classNames, getUserInitials } from "../utils/string";
+import WeedlyLogo from "../assets/weedly_logo_simple.png";
 
 type HeaderProps = {};
 
@@ -54,12 +55,7 @@ const Header: React.FC<HeaderProps> = () => {
                 <Link href="/">
                   <div className="flex items-center divide-x-2 divide-lime-500 cursor-pointer hover:opacity-75">
                     <div className="flex-shrink-0 pr-1">
-                      <Image
-                        src="/weedly_logo_simple.png"
-                        alt="Weedly"
-                        width={40}
-                        height={40}
-                      />
+                      <Image src={WeedlyLogo} alt="" width={40} height={40} />
                     </div>
                     <span className=" pl-2 font-semibold text-lime-600 text-xl">
                       Weedly

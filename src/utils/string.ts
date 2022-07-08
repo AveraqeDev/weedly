@@ -1,11 +1,15 @@
-import { NextApiResponse } from "next";
-
 export const classNames = (...classes: string[]) => {
   return classes.filter(Boolean).join(" ");
 };
 
 export const getUserInitials = (name: string) => {
-  return `${name.split(" ")[0][0].toUpperCase()}${name
-    .split(" ")[1][0]
-    .toUpperCase()}`;
+  const names = name.split(" ");
+  const firstName = names[0];
+  const lastName = names[1];
+
+  if (!firstName || !lastName) {
+    return "WU";
+  }
+
+  return `${firstName[0]?.toUpperCase()}${lastName[0]?.toUpperCase()}`;
 };

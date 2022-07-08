@@ -15,11 +15,12 @@ export const reUpRouter = createRouter()
         include: {
           products: {
             select: {
-              product: true,
+              product: {
+                include: {
+                  tags: true,
+                },
+              },
               addedAt: true,
-            },
-            include: {
-              product: true,
             },
           },
           updates: {
@@ -30,6 +31,9 @@ export const reUpRouter = createRouter()
               updatedAt: true,
             },
           },
+        },
+        orderBy: {
+          date: "desc",
         },
       });
     },
@@ -42,6 +46,22 @@ export const reUpRouter = createRouter()
       return await prisma.reUp.findFirst({
         where: {
           id: input.id,
+        },
+        include: {
+          products: {
+            select: {
+              product: true,
+              addedAt: true,
+            },
+          },
+          updates: {
+            select: {
+              id: true,
+              text: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       });
     },

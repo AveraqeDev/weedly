@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="shadow">
         <Header />
       </header>
-      <main className="max-w-7xl m-auto px-4 py-6">{children}</main>
+      <main className="max-w-7xl h-full m-auto px-4 py-6">{children}</main>
     </>
   );
 };

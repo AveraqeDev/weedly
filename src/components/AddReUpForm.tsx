@@ -8,7 +8,6 @@ import PriceInput from "./form/PriceInput";
 import SearchInput from "./form/SearchInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
-import { parseDateString } from "../utils/date";
 import { useRouter } from "next/router";
 import {
   CreateReUpInputType,
@@ -202,15 +201,15 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
-                    disabled={true}
+                    disabled={isLoading}
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-lime-400 text-base font-medium text-gray-600 hover:bg-lime-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-lime-400"
                     onClick={handleSubmit(save)}
                   >
-                    {true ? "Loading..." : "Add"}
+                    {isLoading ? "Loading..." : "Add"}
                   </button>
                   <button
-                    disabled={true}
+                    disabled={isLoading}
                     type="button"
                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-white"
                     onClick={cancel}

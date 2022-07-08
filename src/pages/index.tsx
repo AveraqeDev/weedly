@@ -1,20 +1,30 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PlusIcon } from "@heroicons/react/outline";
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import ReUpCard from "../components/ReUpCard";
+import Spinner from "../components/Spinner";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = withPageAuthRequired(() => {
   const [formOpen, setFormOpen] = useState(false);
 
-  const reUps: any[] = [];
+  const { data: reUps, isLoading } = trpc.useQuery(["reups.list"]);
+
+  useEffect(() => {
+    console.log(reUps);
+  }, [reUps]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <>
       <AddReUpForm open={formOpen} setOpen={setFormOpen} />
-      {reUps.length < 1 ? (
-        <div className="w-1/3 sm:w-1/2 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">
+      {!reUps || reUps.length < 1 ? (
+        <div className="w-3/4 md:w-1/2 lg:w-1/3 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             fill="none"

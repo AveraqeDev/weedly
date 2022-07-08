@@ -11,7 +11,7 @@ import {
   StarIcon,
   ThumbDownIcon,
 } from "@heroicons/react/outline";
-import { ReUp, ReUpUpdate, Product, ProductTag } from "@prisma/client";
+import { ReUp, Product, ProductTag } from "@prisma/client";
 import Image from "next/image";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
@@ -19,8 +19,18 @@ import Card from "./Card";
 
 type ReUpCardProps = {
   reUp: ReUp & {
-    products: { product: Product & { tags: ProductTag[] } }[];
-    updates: ReUpUpdate[];
+    products: {
+      product: Product & {
+        tags: ProductTag[];
+      };
+      addedAt: Date;
+    }[];
+    updates: {
+      id: number;
+      text: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
   };
 };
 
@@ -92,7 +102,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                         )}
                       />
                     </Disclosure.Button>
-                    <button className="group bg-lime-500 h-7 w-7 rounded-full ring-6 ring-white hover:bg-lime-400">
+                    <button className="group bg-lime-500 h-7 w-7 rounded-full flex items-center justify-center ring-6 ring-white hover:bg-lime-400">
                       <PlusIcon
                         className="h-5 w-5 text-white group-hover:text-gray-500"
                         aria-hidden="true"
@@ -169,7 +179,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                               </Disclosure>
                               <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                 <div className="flex flex-col w-2/3">
-                                  <p className="text-sm text-gray-500">
+                                  <p className="text-sm text-gray-900">
                                     {product.product.name}
                                   </p>
                                   <span className="text-xs text-gray-400">
@@ -183,7 +193,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                   {product.product.tags.map((tag) => (
                                     <span
                                       key={tag.id}
-                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${tag.color}-500 text-white`}
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium tag-${tag.color} text-white`}
                                     >
                                       {tag.name}
                                     </span>

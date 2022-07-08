@@ -88,7 +88,7 @@ export const reUpRouter = createRouter()
           title: input.title,
           from: input.from,
           total: input.total,
-          thoughts: input.thoughts,
+          thoughts: input.thoughts ?? "",
           products: {
             create: products.map((productId) => ({ productId })),
           },

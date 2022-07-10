@@ -76,7 +76,7 @@ function SearchInput<T>(props: SearchInputProps & UseControllerProps<T>) {
           className={classNames(
             error
               ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
-              : "focus:border-lime-500 focust:ring-1 focus:ring-lime-500",
+              : "focus:border-lime-500 focus:ring-1 focus:ring-lime-500",
             "w-full rounded-md bg-white py-2 pl-3 pr-10 shadow-sm focus:outline-none sm:text-sm disabled:hover:cursor-progress disabled:bg-gray-200"
           )}
           onChange={(event) => setQuery(event?.target.value)}

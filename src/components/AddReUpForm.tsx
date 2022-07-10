@@ -78,7 +78,6 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
 
   const { isLoading: productsLoading } = trpc.useQuery(["products.list"], {
     onSuccess(data) {
-      console.log("Setting product options to:", data);
       setProductOptions(
         data.map((product) => ({
           value: product.id,

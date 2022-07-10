@@ -48,8 +48,8 @@ const PriceInput: React.FC<PriceInputProps> = ({
           className={classNames(
             error
               ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
-              : "focust:ring-lime-500 focus:border-lime-500 ",
-            "block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+              : "focus:ring-lime-500 focus:border-lime-500 ",
+            "block w-full pl-7 pr-12 sm:text-sm rounded-md"
           )}
           placeholder={placeholder}
           defaultValue={defaultValue}

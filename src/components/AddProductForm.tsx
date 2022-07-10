@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { createProductValidator } from "../shared/create-product-validator";
 import { trpc } from "../utils/trpc";
 import PriceInput from "./form/PriceInput";
+import SelectInput from "./form/SelectInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
 
@@ -50,6 +51,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ open, setOpen }) => {
 
   const cancel = () => {
     setOpen(false);
+    reset(new FormData());
   };
 
   return (
@@ -118,12 +120,34 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ open, setOpen }) => {
                         />
                       </div>
                       <div className="col-span-6 sm:col-span-3 lg:col-span-3">
-                        <TextInput
+                        <SelectInput<FormData>
                           name="type"
                           placeholder="Product type..."
                           label="Type"
-                          register={register}
+                          control={control}
                           error={errors.type?.message}
+                          options={[
+                            {
+                              value: "PRE_ROLL",
+                              label: "Pre-Roll",
+                            },
+                            {
+                              value: "FLOWER",
+                              label: "Flower",
+                            },
+                            {
+                              value: "CONCENTRATE",
+                              label: "Concentrate",
+                            },
+                            {
+                              value: "MOON_ROCKS",
+                              label: "Moon Rocks",
+                            },
+                            {
+                              value: "OTHER",
+                              label: "Other",
+                            },
+                          ]}
                         />
                       </div>
                       <div className="col-span-6 sm:col-span-3 lg:col-span-3">

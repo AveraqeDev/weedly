@@ -190,7 +190,7 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
                           open={addProductOpen}
                           setOpen={setAddProductOpen}
                         />
-                        <div className="flex items-end">
+                        <div className="flex flex-col items-end md:flex-row">
                           <SearchInput<FormData>
                             name="products"
                             label="Products"
@@ -206,7 +206,7 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
                           <button
                             disabled={productsLoading}
                             type="button"
-                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-lime-400 text-base font-medium text-gray-600 hover:bg-lime-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-lime-400"
+                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm mt-2 px-4 py-2 bg-lime-400 text-base font-medium text-gray-600 hover:bg-lime-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-75 disabled:hover:cursor-not-allowed disabled:hover:bg-lime-400"
                             onClick={() => setAddProductOpen(true)}
                           >
                             <PlusIcon className="h-5 w-5" />

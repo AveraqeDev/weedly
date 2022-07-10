@@ -305,6 +305,7 @@ const Header: React.FC<HeaderProps> = () => {
                     <button
                       type="button"
                       className="ml-auto p-1 rounded-full text-gray-500 hover:bg-lime-300 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-lime-500"
+                      disabled
                     >
                       <span className="sr-only">View notifications</span>
                       <BellIcon className="h-6 w-6" aria-hidden="true" />

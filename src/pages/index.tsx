@@ -1,6 +1,7 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PlusIcon } from "@heroicons/react/outline";
 import type { NextPage } from "next";
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import ReUpCard from "../components/ReUpCard";
@@ -18,6 +19,9 @@ const Home: NextPage = withPageAuthRequired(() => {
 
   return (
     <>
+      <Head>
+        <title>Home | Weedly</title>
+      </Head>
       <AddReUpForm open={formOpen} setOpen={setFormOpen} />
       {!reUps || reUps.length < 1 ? (
         <div className="w-3/4 md:w-1/2 lg:w-1/3 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">

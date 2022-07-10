@@ -64,15 +64,15 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
     defaultValues: new FormData(),
     resolver: zodResolver(createReUpValidator),
   });
-  const router = useRouter();
+  const utils = trpc.useContext();
   const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
   const [addProductOpen, setAddProductOpen] = useState(false);
 
   const { mutate, isLoading } = trpc.useMutation("reups.create", {
     onSuccess: (_) => {
+      utils.invalidateQueries("reups.list");
       setOpen(false);
       reset(new FormData());
-      router.reload();
     },
   });
 

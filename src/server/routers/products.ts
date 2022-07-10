@@ -4,6 +4,12 @@ import { createProductValidator } from "../../shared/create-product-validator";
 import { prisma } from "../db";
 import { createRouter } from "./context";
 
+type TagOption = {
+  value: number;
+  label: string;
+  extra?: string;
+};
+
 export const productRouter = createRouter()
   .query("list", {
     async resolve({ ctx }) {
@@ -38,10 +44,10 @@ export const productRouter = createRouter()
           name: input.name,
           brand: input.brand,
           description: input.description,
-          type: input.type as unknown as ProductType,
+          type: input.type.value as unknown as ProductType,
           price: input.price,
           tags: {
-            connect: tags.map((tagId) => ({ id: tagId })),
+            connect: tags.map((tag: TagOption) => ({ id: tag.value })),
           },
         },
       });

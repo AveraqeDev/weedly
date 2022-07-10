@@ -1,23 +1,51 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { DocumentAddIcon } from "@heroicons/react/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { createProductValidator } from "../shared/create-product-validator";
+import {
+  CreateProductInputType,
+  createProductValidator,
+} from "../shared/create-product-validator";
 import { trpc } from "../utils/trpc";
 import PriceInput from "./form/PriceInput";
+import SearchInput from "./form/SearchInput";
 import SelectInput from "./form/SelectInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
+
+type TypeOption = {
+  value: string;
+  label: string;
+  extra?: string;
+};
+
+type TagOption = {
+  value: number;
+  label: string;
+  extra?: string;
+};
 
 class FormData {
   name: string = "";
   brand: string = "";
   description?: string;
-  type: string = "";
+  type: TypeOption = { value: "", label: "" };
   price: number = 0;
-  tags: string[] = [];
+  tags: TagOption[] = [];
 }
+
+const formToApi = (data: FormData) => {
+  const product: CreateProductInputType = {
+    name: data.name,
+    brand: data.brand,
+    type: data.type,
+    price: data.price,
+    tags: data.tags,
+    description: data.description,
+  };
+  return product;
+};
 
 type AddProductFormProps = {
   open: boolean;
@@ -35,18 +63,32 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ open, setOpen }) => {
     defaultValues: new FormData(),
     resolver: zodResolver(createProductValidator),
   });
+  const utils = trpc.useContext();
+  const [tagOptions, setTagOptions] = useState<TagOption[]>([]);
 
   const { mutate, isLoading } = trpc.useMutation(["products.create"], {
     onSuccess: (_) => {
+      utils.invalidateQueries(["products.list"]);
       setOpen(false);
       reset(new FormData());
+    },
+  });
+
+  const { isLoading: tagsLoading } = trpc.useQuery(["tags.list"], {
+    onSuccess(data) {
+      setTagOptions(
+        data.map((tag) => ({
+          value: tag.id,
+          label: tag.name,
+        }))
+      );
     },
   });
 
   const cancelButtonRef = useRef(null);
 
   const save: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data);
+    mutate(formToApi(data));
   };
 
   const cancel = () => {
@@ -160,13 +202,16 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ open, setOpen }) => {
                         />
                       </div>
                       <div className="col-span-6">
-                        <TextInput
+                        <SearchInput<FormData>
                           name="tags"
-                          placeholder="Product tags..."
                           label="Tags"
-                          register={register}
+                          options={tagOptions}
+                          defaultValue={[]}
+                          placeholder="Product tags..."
+                          multiple
+                          control={control}
                           error={errors.tags?.message}
-                          optional
+                          disabled={tagsLoading}
                         />
                       </div>
                       <div className="col-span-6">

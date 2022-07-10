@@ -65,8 +65,8 @@ function SelectInput<T>(props: SelectInputProps & UseControllerProps<T>) {
           className={classNames(
             error
               ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
-              : "focus:border-lime-500 focus:ring-1 focus:ring-lime-500",
-            "w-full rounded-md border border-gray-500 bg-white py-2 pl-3 pr-10 shadow-sm focus:outline-none sm:text-sm disabled:hover:cursor-progress disabled:bg-gray-200"
+              : "border-gray-500 focus:border-lime-500 focus:ring-1 focus:ring-lime-500",
+            "w-full rounded-md border bg-white py-2 pl-3 pr-10 shadow-sm focus:outline-none sm:text-sm disabled:hover:cursor-progress disabled:bg-gray-200"
           )}
           placeholder={placeholder}
           aria-invalid={error ? "true" : "false"}
@@ -74,11 +74,15 @@ function SelectInput<T>(props: SelectInputProps & UseControllerProps<T>) {
         >
           <span
             className={classNames(
-              (value as Option).label ? "text-gray-900" : "text-gray-500",
+              (value as Option).label === ""
+                ? "text-gray-500"
+                : "text-gray-900",
               "block truncate text-left"
             )}
           >
-            {(value as Option).label ?? placeholder}
+            {(value as Option).label === ""
+              ? placeholder
+              : (value as Option).label}
           </span>
           <span
             className={classNames(

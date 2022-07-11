@@ -4,7 +4,7 @@ import {
   DocumentAddIcon,
   PlusIcon,
 } from "@heroicons/react/outline";
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -12,7 +12,6 @@ import PriceInput from "./form/PriceInput";
 import SearchInput from "./form/SearchInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
-import { useRouter } from "next/router";
 import {
   CreateReUpInputType,
   createReUpValidator,

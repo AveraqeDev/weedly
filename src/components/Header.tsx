@@ -58,9 +58,10 @@ const Header: React.FC<HeaderProps> = () => {
                     <div className="flex-shrink-0 pr-1">
                       <Image src={WeedlyLogo} alt="" width={40} height={40} />
                     </div>
-                    <span className=" pl-2 font-semibold text-lime-600 text-xl">
+                    {/* TODO: Work out spacing to include this */}
+                    {/* <span className="pl-2 font-semibold text-lime-600 text-xl">
                       Weedly
-                    </span>
+                    </span> */}
                   </div>
                 </Link>
                 <div className="hidden md:block">
@@ -156,7 +157,7 @@ const Header: React.FC<HeaderProps> = () => {
                     {/* Profile dropdown */}
                     <Menu as="div" className="ml-3 relative">
                       <div>
-                        <Menu.Button className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">
+                        <Menu.Button className="bg-white rounded-full flex text-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">
                           <span className="sr-only">Open user menu</span>
                           {user?.picture ? (
                             <Image

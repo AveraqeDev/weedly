@@ -3,7 +3,7 @@ import { FolderAddIcon, LoginIcon, PlusIcon } from "@heroicons/react/outline";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import ReUpCard from "../components/ReUpCard";
 import Spinner from "../components/Spinner";
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
     "reups.list",
   ]);
 
-  if (userLoading) {
+  if (userLoading || reUpsLoading) {
     return <Spinner />;
   }
 
@@ -52,17 +52,13 @@ const Home: NextPage = () => {
     );
   }
 
-  if (reUpsLoading) {
-    return <Spinner />;
-  }
-
   return (
     <>
       <Head>
         <title>Home | Weedly</title>
       </Head>
       <AddReUpForm open={formOpen} setOpen={setFormOpen} />
-      {!reUps || reUps.length < 1 ? (
+      {!reUps || reUps.length <= 0 ? (
         <div className="w-3/4 md:w-1/2 lg:w-1/3 mx-auto mt-20 py-5 border border-dashed border-gray-400 rounded-2xl text-center">
           <FolderAddIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No ReUps</h3>

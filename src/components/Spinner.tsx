@@ -5,7 +5,7 @@ type SpinnerProps = {
 
 const Spinner: React.FC<SpinnerProps> = ({
   size = 12,
-  className = `m-2 text-gray-100 animate-spin fill-lime-600`,
+  className = `text-gray-100 animate-spin fill-lime-600`,
 }) => {
   return (
     <div className="flex justify-center items-center w-full h-full">

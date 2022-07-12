@@ -77,7 +77,7 @@ function SearchInput<T>(props: SearchInputProps & UseControllerProps<T>) {
             error
               ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
               : "focus:border-lime-500 focus:ring-1 focus:ring-lime-500",
-            "w-full rounded-md bg-white py-2 pl-3 pr-10 shadow-sm focus:outline-none sm:text-sm disabled:hover:cursor-progress disabled:bg-gray-200"
+            "w-full rounded-md bg-white py-2 pl-3 pr-10 shadow-sm focus:outline-none sm:text-sm disabled:hover:cursor-not-allowed disabled:bg-gray-200"
           )}
           onChange={(event) => setQuery(event?.target.value)}
           displayValue={(option: Option | Option[]) => {
@@ -96,7 +96,7 @@ function SearchInput<T>(props: SearchInputProps & UseControllerProps<T>) {
         <Combobox.Button
           className={classNames(
             error ? "right-6" : "right-0",
-            "absolute inset-y-0 flex items-center rounded-r-md px-2 focus:outline-none"
+            "absolute inset-y-0 flex items-center rounded-r-md px-2 focus:outline-none disabled:hover:cursor-not-allowed"
           )}
         >
           <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />

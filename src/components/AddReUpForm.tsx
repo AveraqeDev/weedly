@@ -19,19 +19,14 @@ import {
 import { trpc } from "../utils/trpc";
 import Spinner from "./Spinner";
 import AddProductForm from "./AddProductForm";
-
-type ProductOption = {
-  value: number;
-  label: string;
-  extra?: string;
-};
+import { SelectOption } from "../shared/interfaces/SelectOption";
 
 class FormData {
   date: string = "";
   title: string = "";
   from?: string;
   total?: number;
-  products: ProductOption[] = [];
+  products: SelectOption<number>[] = [];
   thoughts: string = "";
 }
 
@@ -39,8 +34,8 @@ const formToApi = (data: FormData) => {
   const reUp: CreateReUpInputType = {
     date: new Date(data.date),
     title: data.title,
-    from: data.from ?? undefined,
-    total: data.total ?? undefined,
+    from: data.from,
+    total: data.total,
     thoughts: data.thoughts,
     products: data.products,
   };
@@ -64,7 +59,9 @@ const AddReUpForm: React.FC<AddReUpFormProps> = ({ open, setOpen }) => {
     resolver: zodResolver(createReUpValidator),
   });
   const utils = trpc.useContext();
-  const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
+  const [productOptions, setProductOptions] = useState<SelectOption<number>[]>(
+    []
+  );
   const [addProductOpen, setAddProductOpen] = useState(false);
 
   const { mutate, isLoading } = trpc.useMutation("reups.create", {

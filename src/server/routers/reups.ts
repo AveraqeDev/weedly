@@ -1,13 +1,9 @@
 import { z } from "zod";
+import { SelectOption } from "../../shared/interfaces/SelectOption";
 import { createReUpValidator } from "../../shared/create-reup-validator";
 import { prisma } from "../db";
 import { createRouter } from "./context";
-
-type ProductOption = {
-  value: number;
-  label: string;
-  extra?: string;
-};
+import { productValidator } from "../../shared/product-validator";
 
 export const reUpRouter = createRouter()
   .query("list", {
@@ -86,7 +82,7 @@ export const reUpRouter = createRouter()
     input: createReUpValidator,
     async resolve({ input, ctx }) {
       if (!ctx.user) throw new Error("Unauthorized");
-      const products: ProductOption[] = input.products ?? [];
+      const products: SelectOption<number>[] = input.products ?? [];
       return await prisma.reUp.create({
         data: {
           user: ctx.user.email,
@@ -96,11 +92,49 @@ export const reUpRouter = createRouter()
           total: input.total,
           thoughts: input.thoughts ?? "",
           products: {
-            create: products.map((product: ProductOption) => ({
+            create: products.map((product) => ({
               productId: product.value,
             })),
           },
         },
+      });
+    },
+  })
+  .mutation("add-products", {
+    input: z.object({ id: z.number(), products: productValidator.min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const reUp = await prisma.reUp.findFirst({ where: { id: input.id } });
+      if (!reUp) throw new Error(`No Reup found with id ${input.id}`);
+      if (reUp.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.reUp.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          products: {
+            createMany: {
+              data: input.products.map((product) => ({
+                productId: product.value,
+              })),
+            },
+          },
+        },
+      });
+    },
+  })
+  .mutation("add-update", {
+    input: z.object({
+      id: z.number(),
+      text: z.string().min(5).max(1000),
+    }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const reUp = await prisma.reUp.findFirst({ where: { id: input.id } });
+      if (!reUp) throw new Error(`No Reup found with id ${input.id}`);
+      if (reUp.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.reUpUpdate.create({
+        data: { reUpId: input.id, text: input.text },
       });
     },
   });

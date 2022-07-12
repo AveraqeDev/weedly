@@ -11,30 +11,19 @@ import {
   StarIcon,
   ThumbDownIcon,
 } from "@heroicons/react/outline";
-import { ReUp, Product, ProductTag } from "@prisma/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { ReUp } from "../shared/interfaces/ReUp";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
+import { trpc } from "../utils/trpc";
 import AddProductToReUpForm from "./AddProductToReUpForm";
 import AddUpdateForm from "./AddUpdateForm";
 import Card from "./Card";
+import Spinner from "./Spinner";
 
 type ReUpCardProps = {
-  reUp: ReUp & {
-    products: {
-      product: Product & {
-        tags: ProductTag[];
-      };
-      addedAt: Date;
-    }[];
-    updates: {
-      id: number;
-      text: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }[];
-  };
+  reUp: ReUp;
 };
 
 const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
@@ -42,25 +31,73 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
   const [addUpdateFormOpen, setAddUpdateFormOpen] = useState(false);
   const { user } = useUser();
 
+  const utils = trpc.useContext();
+
+  const { mutate: deleteReUp, isLoading: isDeleting } = trpc.useMutation(
+    "reups.delete",
+    {
+      onSuccess(_) {
+        utils.invalidateQueries("reups.list");
+      },
+    }
+  );
+
   return (
     <>
       <AddProductToReUpForm
         open={addProductFormOpen}
         setOpen={setAddProductFormOpen}
-        reUp={reUp.id}
+        reUp={reUp}
       />
       <AddUpdateForm
         open={addUpdateFormOpen}
         setOpen={setAddUpdateFormOpen}
-        reUp={reUp.id}
+        reUp={reUp}
       />
       <Card
         key={reUp.id}
         header={
           <div className="flex justify-between items-center">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              {reUp.title}
-            </h3>
+            <div className="flex items-center justify-between gap-3 w-1/3 md:w-1/2">
+              <Disclosure>
+                {({ open }) => (
+                  <div className="relative">
+                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                      <DotsHorizontalIcon
+                        className={classNames(
+                          open ? "rotate-180 transform" : "",
+                          "h-5 w-5 text-gray-500 group-hover:text-white"
+                        )}
+                      />
+                    </Disclosure.Button>
+                    <Disclosure.Panel className="origin-top-left absolute left-0 z-10">
+                      <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
+                        <button
+                          disabled={isDeleting}
+                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                          onClick={() => deleteReUp({ id: reUp.id })}
+                        >
+                          {isDeleting ? (
+                            <div className="pr-2">
+                              <Spinner size={5} />
+                            </div>
+                          ) : (
+                            <MinusCircleIcon
+                              className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </Disclosure.Panel>
+                  </div>
+                )}
+              </Disclosure>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                {reUp.title}
+              </h3>
+            </div>
             <div className="flex items-center gap-2 mt-1 max-w-2xl text-sm text-gray-500">
               {user?.picture ? (
                 <Image
@@ -203,7 +240,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                   </div>
                                 )}
                               </Disclosure>
-                              <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                              <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4 items-center">
                                 <div className="flex flex-col w-2/3">
                                   <p className="text-sm text-gray-900">
                                     {product.product.name}
@@ -284,7 +321,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                   aria-hidden="true"
                                 />
                               ) : null}
-                              <div className="relative flex space-x-3">
+                              <div className="relative flex space-x-3 items-center">
                                 <span className="bg-lime-500 h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white">
                                   <ClockIcon
                                     className="h-5 w-5 text-white"

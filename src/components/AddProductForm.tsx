@@ -3,6 +3,7 @@ import { DocumentAddIcon } from "@heroicons/react/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { SelectOption } from "../shared/interfaces/SelectOption";
 import {
   CreateProductInputType,
   createProductValidator,
@@ -14,35 +15,23 @@ import SelectInput from "./form/SelectInput";
 import TextAreaInput from "./form/TextAreaInput";
 import TextInput from "./form/TextInput";
 
-type TypeOption = {
-  value: string;
-  label: string;
-  extra?: string;
-};
-
-type TagOption = {
-  value: number;
-  label: string;
-  extra?: string;
-};
-
 class FormData {
   name: string = "";
   brand: string = "";
-  description?: string;
-  type: TypeOption = { value: "", label: "" };
-  price: number = 0;
-  tags: TagOption[] = [];
+  description: string = "";
+  type: SelectOption<string> = { value: "", label: "" };
+  price: number | null = null;
+  tags: SelectOption<number>[] = [];
 }
 
 const formToApi = (data: FormData) => {
   const product: CreateProductInputType = {
     name: data.name,
     brand: data.brand,
-    type: data.type,
-    price: data.price,
-    tags: data.tags,
     description: data.description,
+    type: data.type,
+    price: data.price || 0.01,
+    tags: data.tags,
   };
   return product;
 };
@@ -64,7 +53,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ open, setOpen }) => {
     resolver: zodResolver(createProductValidator),
   });
   const utils = trpc.useContext();
-  const [tagOptions, setTagOptions] = useState<TagOption[]>([]);
+  const [tagOptions, setTagOptions] = useState<SelectOption<number>[]>([]);
 
   const { mutate, isLoading } = trpc.useMutation(["products.create"], {
     onSuccess: (_) => {

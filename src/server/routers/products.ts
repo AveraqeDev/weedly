@@ -13,7 +13,7 @@ type TagOption = {
 export const productRouter = createRouter()
   .query("list", {
     async resolve({ ctx }) {
-      if (!ctx.user) return [];
+      if (!ctx.user) throw new Error("Unauthorized");
 
       return await prisma.product.findMany({
         include: {
@@ -34,6 +34,60 @@ export const productRouter = createRouter()
       });
     },
   })
+  .query("user-favorites", {
+    async resolve({ ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+
+      return await prisma.userProductFavorite.findMany({
+        where: {
+          user: ctx.user.email,
+        },
+        include: {
+          product: {
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+    },
+  })
+  .query("user-dislikes", {
+    async resolve({ ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+
+      return await prisma.userProductDislike.findMany({
+        where: {
+          user: ctx.user.email,
+        },
+        include: {
+          product: {
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+    },
+  })
+  .query("user-ratings", {
+    async resolve({ ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+
+      return await prisma.productReview.findMany({
+        where: {
+          user: ctx.user.email,
+        },
+        include: {
+          product: {
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+    },
+  })
   .mutation("create", {
     input: createProductValidator,
     async resolve({ input, ctx }) {
@@ -49,6 +103,42 @@ export const productRouter = createRouter()
           tags: {
             connect: tags.map((tag: TagOption) => ({ id: tag.value })),
           },
+        },
+      });
+    },
+  })
+  .mutation("favorite", {
+    input: z.object({ id: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      return await prisma.userProductFavorite.create({
+        data: { productId: input.id, user: ctx.user.email },
+      });
+    },
+  })
+  .mutation("dislike", {
+    input: z.object({ id: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      return await prisma.userProductDislike.create({
+        data: { productId: input.id, user: ctx.user.email },
+      });
+    },
+  })
+  .mutation("rate", {
+    input: z.object({
+      id: z.number().min(1),
+      rating: z.number().min(1).max(5),
+      review: z.string().min(5).max(1000),
+    }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      return await prisma.productReview.create({
+        data: {
+          productId: input.id,
+          rating: input.rating,
+          review: input.review,
+          user: ctx.user.email,
         },
       });
     },

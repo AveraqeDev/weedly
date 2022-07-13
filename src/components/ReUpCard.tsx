@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/outline";
 import Image from "next/image";
 import { useState } from "react";
+import { productRouter } from "../server/routers/products";
 import { ReUp } from "../shared/interfaces/ReUp";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
@@ -20,6 +21,7 @@ import { trpc } from "../utils/trpc";
 import AddProductToReUpForm from "./AddProductToReUpForm";
 import AddUpdateForm from "./AddUpdateForm";
 import Card from "./Card";
+import RateProductForm from "./RateProductForm";
 import Spinner from "./Spinner";
 
 type ReUpCardProps = {
@@ -29,6 +31,7 @@ type ReUpCardProps = {
 const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
   const [addProductFormOpen, setAddProductFormOpen] = useState(false);
   const [addUpdateFormOpen, setAddUpdateFormOpen] = useState(false);
+  const [rateFormOpen, setRateFormOpen] = useState(false);
   const { user } = useUser();
 
   const utils = trpc.useContext();
@@ -46,6 +49,20 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
     trpc.useMutation("reups.remove-product", {
       onSuccess(_) {
         utils.invalidateQueries("reups.list");
+      },
+    });
+
+  const { mutate: favoriteProduct, isLoading: isFavoritingProduct } =
+    trpc.useMutation("products.favorite", {
+      onSuccess(_) {
+        utils.invalidateQueries("products.user-favorites");
+      },
+    });
+
+  const { mutate: dislikeProduct, isLoading: isDislikingProduct } =
+    trpc.useMutation("products.dislike", {
+      onSuccess(_) {
+        utils.invalidateQueries("products.user-dislikes");
       },
     });
 
@@ -218,19 +235,33 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           />
                                           <span>Remove</span>
                                         </button>
-                                        <button
-                                          disabled
-                                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                                        >
-                                          <StarIcon
-                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
-                                            aria-hidden="true"
+                                        <>
+                                          <RateProductForm
+                                            open={rateFormOpen}
+                                            setOpen={setRateFormOpen}
+                                            product={product.product}
                                           />
-                                          <span>Rate</span>
-                                        </button>
+                                          <button
+                                            className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                            onClick={() =>
+                                              setRateFormOpen(true)
+                                            }
+                                          >
+                                            <StarIcon
+                                              className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                              aria-hidden="true"
+                                            />
+                                            <span>Rate</span>
+                                          </button>
+                                        </>
                                         <button
-                                          disabled
+                                          disabled={isFavoritingProduct}
                                           className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() =>
+                                            favoriteProduct({
+                                              id: product.product.id,
+                                            })
+                                          }
                                         >
                                           <HeartIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
@@ -239,8 +270,13 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           <span>Favorite</span>
                                         </button>
                                         <button
-                                          disabled
+                                          disabled={isDislikingProduct}
                                           className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() =>
+                                            dislikeProduct({
+                                              id: product.product.id,
+                                            })
+                                          }
                                         >
                                           <ThumbDownIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"

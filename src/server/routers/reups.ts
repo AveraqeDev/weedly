@@ -149,8 +149,9 @@ export const reUpRouter = createRouter()
       });
     },
   })
+  // DEV MUTATION, PLEASE REMOVE
   .mutation("remove-orphans", {
-    async resolve({ ctx }) {
+    async resolve(_) {
       try {
         const products = await prisma.reUpProduct.deleteMany({
           where: {
@@ -169,5 +170,17 @@ export const reUpRouter = createRouter()
       } catch (error) {
         return { status: "error", message: error };
       }
+    },
+  })
+  .mutation("remove-product", {
+    input: z.object({ id: z.number().min(1), reUpId: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const reUp = await prisma.reUp.findFirst({ where: { id: input.reUpId } });
+      if (!reUp) throw new Error(`No Reup found with id ${input.id}`);
+      if (reUp.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.reUpProduct.deleteMany({
+        where: { productId: input.id, reUpId: input.reUpId },
+      });
     },
   });

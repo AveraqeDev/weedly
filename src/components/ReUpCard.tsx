@@ -12,7 +12,7 @@ import {
   ThumbDownIcon,
 } from "@heroicons/react/outline";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { ReUp } from "../shared/interfaces/ReUp";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
@@ -41,6 +41,13 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
       },
     }
   );
+
+  const { mutate: removeProduct, isLoading: isRemovingProduct } =
+    trpc.useMutation("reups.remove-product", {
+      onSuccess(_) {
+        utils.invalidateQueries("reups.list");
+      },
+    });
 
   return (
     <>
@@ -196,8 +203,14 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                     <Disclosure.Panel className="origin-top-left absolute left-0 z-10">
                                       <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
                                         <button
-                                          disabled
+                                          disabled={isRemovingProduct}
                                           className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() =>
+                                            removeProduct({
+                                              id: product.product.id,
+                                              reUpId: reUp.id,
+                                            })
+                                          }
                                         >
                                           <MinusCircleIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"

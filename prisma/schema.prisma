@@ -48,7 +48,7 @@ model ProductReview {
   review    String   @db.Text
   rating    Int
   user      String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,9 +69,9 @@ model ReUp {
 }
 
 model ReUpProduct {
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
-  reUp      ReUp     @relation(fields: [reUpId], references: [id])
+  reUp      ReUp     @relation(fields: [reUpId], references: [id], onDelete: Cascade)
   reUpId    Int
   addedAt   DateTime @default(now())
 
@@ -81,7 +81,7 @@ model ReUpProduct {
 model ReUpUpdate {
   id        Int      @id @default(autoincrement())
   text      String   @db.Text
-  reUp      ReUp     @relation(fields: [reUpId], references: [id])
+  reUp      ReUp     @relation(fields: [reUpId], references: [id], onDelete: Cascade)
   reUpId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,7 +89,7 @@ model ReUpUpdate {
 
 model UserProductFavorite {
   id        Int      @id @default(autoincrement())
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
   user      String
   addedAt   DateTime @default(now())
@@ -97,7 +97,7 @@ model UserProductFavorite {
 
 model UserProductDislike {
   id        Int      @id @default(autoincrement())
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
   user      String
   addedAt   DateTime @default(now())

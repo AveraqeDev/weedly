@@ -72,10 +72,21 @@ export const reUpRouter = createRouter()
     input: z.object({ id: z.number() }),
     async resolve({ input, ctx }) {
       if (!ctx.user) throw new Error("Unauthorized");
-      const reUp = await prisma.reUp.findFirst({ where: { id: input.id } });
+      const reUp = await prisma.reUp.findFirst({
+        where: { id: input.id },
+        include: { products: true, updates: true },
+      });
       if (!reUp) throw new Error(`No Reup found with id ${input.id}`);
       if (reUp.user !== ctx.user.email) throw new Error("Unauthorized");
-      return await prisma.reUp.delete({ where: { id: input.id } });
+      await prisma.reUpProduct.deleteMany({
+        where: {
+          reUpId: input.id,
+        },
+      });
+      await prisma.reUpUpdate.deleteMany({ where: { reUpId: input.id } });
+      return await prisma.reUp.delete({
+        where: { id: input.id },
+      });
     },
   })
   .mutation("create", {
@@ -136,5 +147,27 @@ export const reUpRouter = createRouter()
       return await prisma.reUpUpdate.create({
         data: { reUpId: input.id, text: input.text },
       });
+    },
+  })
+  .mutation("remove-orphans", {
+    async resolve({ ctx }) {
+      try {
+        const products = await prisma.reUpProduct.deleteMany({
+          where: {
+            reUp: undefined,
+          },
+        });
+        const updates = await prisma.reUpUpdate.deleteMany({
+          where: {
+            reUp: undefined,
+          },
+        });
+        return {
+          status: "success",
+          message: `Successfully removed ${products.count} Products and ${updates.count} Updates`,
+        };
+      } catch (error) {
+        return { status: "error", message: error };
+      }
     },
   });

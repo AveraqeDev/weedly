@@ -5,12 +5,13 @@ import { Product, ProductTag } from "@prisma/client";
 import { Fragment, useCallback, useRef } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { SelectOption } from "../shared/interfaces/SelectOption";
 import { trpc } from "../utils/trpc";
 import SelectInput from "./form/SelectInput";
 import TextAreaInput from "./form/TextAreaInput";
 
 class FormData {
-  rating: number = 0;
+  rating: SelectOption<number> = { value: 0, label: "" };
   review: string = "";
 }
 
@@ -29,7 +30,7 @@ const RateProductForm: React.FC<RateProductFormProps> = ({
     (data: FormData) => {
       return {
         id: product.id,
-        rating: data.rating,
+        rating: data.rating.value,
         review: data.review,
       };
     },
@@ -117,7 +118,7 @@ const RateProductForm: React.FC<RateProductFormProps> = ({
                       </span>
                     </Dialog.Title>
                     <div className="py-3 pr-4">
-                      <div className="flex flex-col items-end gap-2 md:flex-row">
+                      <div className="flex flex-col items-center gap-2">
                         <SelectInput<FormData>
                           name="rating"
                           placeholder="Your rating..."

@@ -13,7 +13,6 @@ import {
 } from "@heroicons/react/outline";
 import Image from "next/image";
 import { useState } from "react";
-import { productRouter } from "../server/routers/products";
 import { ReUp } from "../shared/interfaces/ReUp";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
@@ -66,6 +65,9 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
       },
     });
 
+  const { data: userFavorites } = trpc.useQuery(["products.user-favorites"]);
+  const { data: userDislikes } = trpc.useQuery(["products.user-dislikes"]);
+
   return (
     <>
       <AddProductToReUpForm
@@ -84,7 +86,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
           <div className="flex justify-between items-center">
             <div className="flex items-center justify-between gap-3 w-1/3 md:w-1/2">
               <Disclosure>
-                {({ open }) => (
+                {({ open, close }) => (
                   <div className="relative">
                     <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
                       <DotsHorizontalIcon
@@ -98,8 +100,11 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                       <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
                         <button
                           disabled={isDeleting}
-                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                          onClick={() => deleteReUp({ id: reUp.id })}
+                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                          onClick={() => {
+                            deleteReUp({ id: reUp.id });
+                            close();
+                          }}
                         >
                           {isDeleting ? (
                             <div className="pr-2">
@@ -203,11 +208,11 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                             </p>
                           </div>
                         )}
-                        {reUp.products.map((product, idx) => (
+                        {reUp.products.map((product) => (
                           <li key={product.product.id} className="pb-6">
                             <div className="flex space-x-3 items-center">
                               <Disclosure>
-                                {({ open }) => (
+                                {({ open, close }) => (
                                   <div className="relative">
                                     <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
                                       <DotsHorizontalIcon
@@ -221,13 +226,14 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                       <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
                                         <button
                                           disabled={isRemovingProduct}
-                                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                                          onClick={() =>
+                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() => {
                                             removeProduct({
                                               id: product.product.id,
                                               reUpId: reUp.id,
-                                            })
-                                          }
+                                            });
+                                            close();
+                                          }}
                                         >
                                           <MinusCircleIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
@@ -242,10 +248,11 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                             product={product.product}
                                           />
                                           <button
-                                            className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                                            onClick={() =>
-                                              setRateFormOpen(true)
-                                            }
+                                            className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                            onClick={() => {
+                                              setRateFormOpen(true);
+                                              close();
+                                            }}
                                           >
                                             <StarIcon
                                               className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
@@ -255,13 +262,27 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           </button>
                                         </>
                                         <button
-                                          disabled={isFavoritingProduct}
-                                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                                          onClick={() =>
+                                          disabled={
+                                            userFavorites
+                                              ?.map(
+                                                (favorite) =>
+                                                  favorite.product.id
+                                              )
+                                              .includes(product.product.id) ||
+                                            userDislikes
+                                              ?.map(
+                                                (dislike) => dislike.product.id
+                                              )
+                                              .includes(product.product.id) ||
+                                            isFavoritingProduct
+                                          }
+                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() => {
                                             favoriteProduct({
                                               id: product.product.id,
-                                            })
-                                          }
+                                            });
+                                            close();
+                                          }}
                                         >
                                           <HeartIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
@@ -270,13 +291,27 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           <span>Favorite</span>
                                         </button>
                                         <button
-                                          disabled={isDislikingProduct}
-                                          className="disabled:cursor-not-allowed disabled:hover:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
-                                          onClick={() =>
+                                          disabled={
+                                            userDislikes
+                                              ?.map(
+                                                (dislike) => dislike.product.id
+                                              )
+                                              .includes(product.product.id) ||
+                                            userFavorites
+                                              ?.map(
+                                                (favorite) =>
+                                                  favorite.product.id
+                                              )
+                                              .includes(product.product.id) ||
+                                            isDislikingProduct
+                                          }
+                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                          onClick={() => {
                                             dislikeProduct({
                                               id: product.product.id,
-                                            })
-                                          }
+                                            });
+                                            close();
+                                          }}
                                         >
                                           <ThumbDownIcon
                                             className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"

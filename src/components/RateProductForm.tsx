@@ -47,7 +47,10 @@ const RateProductForm: React.FC<RateProductFormProps> = ({
     defaultValues: new FormData(),
     resolver: zodResolver(
       z.object({
-        rating: z.number().min(1).max(5),
+        rating: z.object({
+          value: z.number().min(1).max(5),
+          label: z.string(),
+        }),
         review: z.string().min(5).max(1000),
       })
     ),
@@ -112,49 +115,53 @@ const RateProductForm: React.FC<RateProductFormProps> = ({
                       as="h3"
                       className="text-lg leading-6 pt-2 font-medium text-gray-900"
                     >
-                      Add Review to {product.name}{" "}
+                      Rate {product.name}{" "}
                       <span className="text-sm text-gray-400">
                         ({product.brand})
                       </span>
                     </Dialog.Title>
                     <div className="py-3 pr-4">
                       <div className="flex flex-col items-center gap-2">
-                        <SelectInput<FormData>
-                          name="rating"
-                          placeholder="Your rating..."
-                          label="Rating"
-                          control={control}
-                          error={errors.rating?.message}
-                          options={[
-                            {
-                              value: 1,
-                              label: "1",
-                            },
-                            {
-                              value: 2,
-                              label: "2",
-                            },
-                            {
-                              value: 3,
-                              label: "3",
-                            },
-                            {
-                              value: 4,
-                              label: "4",
-                            },
-                            {
-                              value: 5,
-                              label: "5",
-                            },
-                          ]}
-                        />
-                        <TextAreaInput
-                          name="review"
-                          placeholder="Your review on this Product"
-                          label="Review"
-                          register={register}
-                          error={errors.review?.message}
-                        />
+                        <div className="w-full">
+                          <SelectInput<FormData>
+                            name="rating"
+                            placeholder="Your rating..."
+                            label="Rating"
+                            control={control}
+                            error={errors.rating?.message}
+                            options={[
+                              {
+                                value: 1,
+                                label: "1",
+                              },
+                              {
+                                value: 2,
+                                label: "2",
+                              },
+                              {
+                                value: 3,
+                                label: "3",
+                              },
+                              {
+                                value: 4,
+                                label: "4",
+                              },
+                              {
+                                value: 5,
+                                label: "5",
+                              },
+                            ]}
+                          />
+                        </div>
+                        <div className="w-full">
+                          <TextAreaInput
+                            name="review"
+                            placeholder="Your review on this Product"
+                            label="Review"
+                            register={register}
+                            error={errors.review?.message}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

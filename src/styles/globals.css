@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+.rating-green {
+  @apply bg-green-100;
+  @apply text-green-800;
+}
+
+.rating-lime {
+  @apply bg-lime-100;
+  @apply text-lime-800;
+}
+
+.rating-yellow {
+  @apply bg-yellow-100;
+  @apply text-yellow-800;
+}
+
+.rating-orange {
+  @apply bg-orange-100;
+  @apply text-orange-800;
+}
+
+.rating-red {
+  @apply bg-red-100;
+  @apply text-red-800;
+}
+
 .tag-red {
   @apply bg-red-500;
 }

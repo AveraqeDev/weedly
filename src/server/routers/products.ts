@@ -116,12 +116,40 @@ export const productRouter = createRouter()
       });
     },
   })
+  .mutation("delete-favorite", {
+    input: z.object({ id: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const favorite = await prisma.userProductFavorite.findFirst({
+        where: { id: input.id },
+      });
+      if (!favorite) throw new Error(`No Favorite found with id ${input.id}`);
+      if (favorite.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.userProductFavorite.deleteMany({
+        where: { id: input.id },
+      });
+    },
+  })
   .mutation("dislike", {
     input: z.object({ id: z.number().min(1) }),
     async resolve({ input, ctx }) {
       if (!ctx.user) throw new Error("Unauthorized");
       return await prisma.userProductDislike.create({
         data: { productId: input.id, user: ctx.user.email },
+      });
+    },
+  })
+  .mutation("delete-dislike", {
+    input: z.object({ id: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const dislike = await prisma.userProductDislike.findFirst({
+        where: { id: input.id },
+      });
+      if (!dislike) throw new Error(`No Dislike found with id ${input.id}`);
+      if (dislike.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.userProductDislike.deleteMany({
+        where: { id: input.id },
       });
     },
   })
@@ -140,6 +168,20 @@ export const productRouter = createRouter()
           review: input.review,
           user: ctx.user.email,
         },
+      });
+    },
+  })
+  .mutation("delete-review", {
+    input: z.object({ id: z.number().min(1) }),
+    async resolve({ input, ctx }) {
+      if (!ctx.user) throw new Error("Unauthorized");
+      const review = await prisma.productReview.findFirst({
+        where: { id: input.id },
+      });
+      if (!review) throw new Error(`No Review found with id ${input.id}`);
+      if (review.user !== ctx.user.email) throw new Error("Unauthorized");
+      return await prisma.productReview.deleteMany({
+        where: { id: input.id },
       });
     },
   });

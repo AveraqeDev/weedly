@@ -3,7 +3,7 @@ import { FolderAddIcon, LoginIcon, PlusIcon } from "@heroicons/react/outline";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddReUpForm from "../components/AddReUpForm";
 import ReUpCard from "../components/ReUpCard";
 import Spinner from "../components/Spinner";

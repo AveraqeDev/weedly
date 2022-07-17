@@ -38,7 +38,7 @@ const Dislikes: NextPage = withPageAuthRequired(() => {
       {userDislikesLoading ? (
         <Spinner />
       ) : userDislikes ? (
-        <div className="max-w-5xl m-auto">
+        <div className="max-w-4xl m-auto">
           <div className="flex justify-between mt-10 mb-10">
             <h2 className="text-2xl font-semibold text-gray-600 border-b-2 border-lime-500 pr-5">
               My Dislikes

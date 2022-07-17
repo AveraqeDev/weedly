@@ -2,6 +2,7 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { Disclosure } from "@headlessui/react";
 import {
   CalendarIcon,
+  ChatIcon,
   ChevronUpIcon,
   MinusIcon,
 } from "@heroicons/react/outline";
@@ -40,7 +41,7 @@ const Ratings: NextPage = withPageAuthRequired(({ user }) => {
       {userRatingsLoading ? (
         <Spinner />
       ) : userRatings ? (
-        <div className="max-w-5xl m-auto">
+        <div className="max-w-4xl m-auto">
           <div className="flex justify-between mt-10 mb-10">
             <h2 className="text-2xl font-semibold text-gray-600 border-b-2 border-lime-500 pr-5">
               My Ratings
@@ -115,7 +116,13 @@ const Ratings: NextPage = withPageAuthRequired(({ user }) => {
                               </div>
                             </div>
                           </div>
-                          <Disclosure.Panel className="p-4">
+                          <Disclosure.Panel className="max-w-3xl m-auto p-4 flex gap-2 items-center">
+                            <span className="bg-lime-500 h-7 w-7 rounded-full flex items-center justify-center ring-7 ring-white">
+                              <ChatIcon
+                                className="h-5 w-5 text-white"
+                                aria-hidden="true"
+                              />
+                            </span>
                             <p className="text-sm">{rating.review}</p>
                           </Disclosure.Panel>
                         </>

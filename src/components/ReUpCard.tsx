@@ -1,7 +1,7 @@
 import { useUser } from "@auth0/nextjs-auth0";
-import { Disclosure } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
-  ChevronUpIcon,
+  ChevronDownIcon,
   ClockIcon,
   DotsHorizontalIcon,
   HeartIcon,
@@ -12,7 +12,7 @@ import {
   ThumbDownIcon,
 } from "@heroicons/react/outline";
 import Image from "next/image";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ReUp } from "../shared/interfaces/ReUp";
 import { formatDate } from "../utils/date";
 import { classNames, getUserInitials } from "../utils/string";
@@ -85,22 +85,30 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
         header={
           <div className="flex justify-between items-center">
             <div className="flex items-center justify-between gap-3 w-1/3 md:w-1/2">
-              <Disclosure>
-                {({ open, close }) => (
-                  <div className="relative">
-                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                      <DotsHorizontalIcon
-                        className={classNames(
-                          open ? "rotate-180 transform" : "",
-                          "h-5 w-5 text-gray-500 group-hover:text-white"
-                        )}
-                      />
-                    </Disclosure.Button>
-                    <Disclosure.Panel className="origin-top-left absolute left-0 z-10">
-                      <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
+              <Menu as="div" className="ml-3 relative">
+                <div>
+                  <Menu.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                    <DotsHorizontalIcon className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                  </Menu.Button>
+                </div>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="origin-top-left absolute right-0 mt-2 w-36 z-10 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Item>
+                      {({ active }) => (
                         <button
+                          className={classNames(
+                            active ? "bg-lime-500 text-white" : "",
+                            "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500 disabled:cursor-not-allowed disabled:bg-gray-200"
+                          )}
                           disabled={isDeleting}
-                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                           onClick={() => {
                             deleteReUp({ id: reUp.id });
                             close();
@@ -112,17 +120,22 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                             </div>
                           ) : (
                             <MinusCircleIcon
-                              className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                              className={classNames(
+                                active
+                                  ? "bg-lime-500 text-white"
+                                  : "text-lime-600 group-hover:text-white",
+                                "mr-3 h-6 w-6"
+                              )}
                               aria-hidden="true"
                             />
                           )}
                           <span>Delete</span>
                         </button>
-                      </div>
-                    </Disclosure.Panel>
-                  </div>
-                )}
-              </Disclosure>
+                      )}
+                    </Menu.Item>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
               <h3 className="text-lg leading-6 font-medium text-gray-900">
                 {reUp.title}
               </h3>
@@ -179,7 +192,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                     </span>
                     <div className="flex items-center gap-2">
                       <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                        <ChevronUpIcon
+                        <ChevronDownIcon
                           className={classNames(
                             open ? "rotate-180 transform" : "",
                             "h-5 w-5 text-gray-500 group-hover:text-white"
@@ -211,22 +224,37 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                         {reUp.products.map((product) => (
                           <li key={product.product.id} className="pb-6">
                             <div className="flex space-x-3 items-center">
-                              <Disclosure>
-                                {({ open, close }) => (
-                                  <div className="relative">
-                                    <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                                      <DotsHorizontalIcon
-                                        className={classNames(
-                                          open ? "rotate-180 transform" : "",
-                                          "h-5 w-5 text-gray-500 group-hover:text-white"
-                                        )}
-                                      />
-                                    </Disclosure.Button>
-                                    <Disclosure.Panel className="origin-top-left absolute left-0 z-10">
-                                      <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
+                              <Menu as="div" className="ml-3 relative">
+                                <div>
+                                  <Menu.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                                    <DotsHorizontalIcon
+                                      className={classNames(
+                                        open ? "rotate-180 transform" : "",
+                                        "h-5 w-5 text-gray-500 group-hover:text-white"
+                                      )}
+                                    />
+                                  </Menu.Button>
+                                </div>
+                                <Transition
+                                  as={Fragment}
+                                  enter="transition ease-out duration-100"
+                                  enterFrom="transform opacity-0 scale-95"
+                                  enterTo="transform opacity-100 scale-100"
+                                  leave="transition ease-in duration-75"
+                                  leaveFrom="transform opacity-100 scale-100"
+                                  leaveTo="transform opacity-0 scale-95"
+                                >
+                                  <Menu.Items className="origin-top-left absolute right-0 mt-2 w-36 z-10 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <Menu.Item>
+                                      {({ active }) => (
                                         <button
+                                          className={classNames(
+                                            active
+                                              ? "bg-lime-500 text-white"
+                                              : "",
+                                            "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500 disabled:cursor-not-allowed disabled:bg-gray-200"
+                                          )}
                                           disabled={isRemovingProduct}
-                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                                           onClick={() => {
                                             removeProduct({
                                               id: product.product.id,
@@ -236,11 +264,20 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           }}
                                         >
                                           <MinusCircleIcon
-                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            className={classNames(
+                                              active
+                                                ? "bg-lime-500 text-white"
+                                                : "text-lime-600 group-hover:text-white",
+                                              "mr-3 h-6 w-6"
+                                            )}
                                             aria-hidden="true"
                                           />
                                           <span>Remove</span>
                                         </button>
+                                      )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                      {({ active }) => (
                                         <>
                                           <RateProductForm
                                             open={rateFormOpen}
@@ -248,20 +285,40 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                             product={product.product}
                                           />
                                           <button
-                                            className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                            className={classNames(
+                                              active
+                                                ? "bg-lime-500 text-white"
+                                                : "",
+                                              "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                            )}
                                             onClick={() => {
                                               setRateFormOpen(true);
                                               close();
                                             }}
                                           >
                                             <StarIcon
-                                              className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                              className={classNames(
+                                                active
+                                                  ? "bg-lime-500 text-white"
+                                                  : "text-lime-600 group-hover:text-white",
+                                                "mr-3 h-6 w-6"
+                                              )}
                                               aria-hidden="true"
                                             />
                                             <span>Rate</span>
                                           </button>
                                         </>
+                                      )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                      {({ active }) => (
                                         <button
+                                          className={classNames(
+                                            active
+                                              ? "bg-lime-500 text-white"
+                                              : "",
+                                            "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500 disabled:cursor-not-allowed disabled:bg-gray-200"
+                                          )}
                                           disabled={
                                             userFavorites
                                               ?.map(
@@ -276,7 +333,6 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                               .includes(product.product.id) ||
                                             isFavoritingProduct
                                           }
-                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                                           onClick={() => {
                                             favoriteProduct({
                                               id: product.product.id,
@@ -285,12 +341,27 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           }}
                                         >
                                           <HeartIcon
-                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            className={classNames(
+                                              active
+                                                ? "bg-lime-500 text-white"
+                                                : "text-lime-600 group-hover:text-white",
+                                              "mr-3 h-6 w-6"
+                                            )}
                                             aria-hidden="true"
                                           />
                                           <span>Favorite</span>
                                         </button>
+                                      )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                      {({ active }) => (
                                         <button
+                                          className={classNames(
+                                            active
+                                              ? "bg-lime-500 text-white"
+                                              : "",
+                                            "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500 disabled:cursor-not-allowed disabled:bg-gray-200"
+                                          )}
                                           disabled={
                                             userDislikes
                                               ?.map(
@@ -305,7 +376,6 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                               .includes(product.product.id) ||
                                             isDislikingProduct
                                           }
-                                          className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                                           onClick={() => {
                                             dislikeProduct({
                                               id: product.product.id,
@@ -314,16 +384,21 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                                           }}
                                         >
                                           <ThumbDownIcon
-                                            className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                            className={classNames(
+                                              active
+                                                ? "bg-lime-500 text-white"
+                                                : "text-lime-600 group-hover:text-white",
+                                              "mr-3 h-6 w-6"
+                                            )}
                                             aria-hidden="true"
                                           />
                                           <span>Dislike</span>
                                         </button>
-                                      </div>
-                                    </Disclosure.Panel>
-                                  </div>
-                                )}
-                              </Disclosure>
+                                      )}
+                                    </Menu.Item>
+                                  </Menu.Items>
+                                </Transition>
+                              </Menu>
                               <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4 items-center">
                                 <div className="flex flex-col w-2/3">
                                   <p className="text-sm text-gray-900">
@@ -367,7 +442,7 @@ const ReUpCard: React.FC<ReUpCardProps> = ({ reUp }) => {
                     </span>
                     <div className="flex items-center gap-2">
                       <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                        <ChevronUpIcon
+                        <ChevronDownIcon
                           className={classNames(
                             open ? "rotate-180 transform" : "",
                             "h-5 w-5 text-gray-500 group-hover:text-white"

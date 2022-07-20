@@ -1,15 +1,16 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { Disclosure } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   AnnotationIcon,
   CalendarIcon,
-  ChevronUpIcon,
+  ChevronDownIcon,
   DotsHorizontalIcon,
   MinusCircleIcon,
   MinusIcon,
 } from "@heroicons/react/outline";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { Fragment } from "react";
 import Spinner from "../components/Spinner";
 import { formatDate } from "../utils/date";
 import { classNames } from "../utils/string";
@@ -56,24 +57,32 @@ const Favorites: NextPage = withPageAuthRequired(({ user }) => {
                             <div className="px-4 py-4 sm:px-6">
                               <div className="flex items-center justify-between">
                                 <p className="flex items-center gap-2">
-                                  <Disclosure as="div">
-                                    {({ open, close }) => (
-                                      <div className="relative">
-                                        <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                                          <DotsHorizontalIcon
-                                            className={classNames(
-                                              open
-                                                ? "rotate-180 transform"
-                                                : "",
-                                              "h-5 w-5 text-gray-500 group-hover:text-white"
-                                            )}
-                                          />
-                                        </Disclosure.Button>
-                                        <Disclosure.Panel className="origin-top-left absolute left-0 z-20">
-                                          <div className="flex flex-col bg-white py-1 ring-1 ring-gray-200 rounded-md">
+                                  <Menu as="div" className="ml-3 relative">
+                                    <div>
+                                      <Menu.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
+                                        <DotsHorizontalIcon className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                                      </Menu.Button>
+                                    </div>
+                                    <Transition
+                                      as={Fragment}
+                                      enter="transition ease-out duration-100"
+                                      enterFrom="transform opacity-0 scale-95"
+                                      enterTo="transform opacity-100 scale-100"
+                                      leave="transition ease-in duration-75"
+                                      leaveFrom="transform opacity-100 scale-100"
+                                      leaveTo="transform opacity-0 scale-95"
+                                    >
+                                      <Menu.Items className="origin-top-left absolute right-0 mt-2 w-36 z-10 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                        <Menu.Item>
+                                          {({ active }) => (
                                             <button
+                                              className={classNames(
+                                                active
+                                                  ? "bg-lime-500 text-white"
+                                                  : "",
+                                                "w-full group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500 disabled:cursor-not-allowed disabled:bg-gray-200"
+                                              )}
                                               disabled={isDeleting}
-                                              className="disabled:cursor-not-allowed disabled:bg-gray-200 group flex items-center px-2 py-1 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                                               onClick={() => {
                                                 deleteFavorite({
                                                   id: favorite.id,
@@ -87,17 +96,22 @@ const Favorites: NextPage = withPageAuthRequired(({ user }) => {
                                                 </div>
                                               ) : (
                                                 <MinusCircleIcon
-                                                  className="text-lime-600 group-hover:text-white mr-3 h-6 w-6"
+                                                  className={classNames(
+                                                    active
+                                                      ? "bg-lime-500 text-white"
+                                                      : "text-lime-600 group-hover:text-white",
+                                                    "mr-3 h-6 w-6"
+                                                  )}
                                                   aria-hidden="true"
                                                 />
                                               )}
                                               <span>Delete</span>
                                             </button>
-                                          </div>
-                                        </Disclosure.Panel>
-                                      </div>
-                                    )}
-                                  </Disclosure>
+                                          )}
+                                        </Menu.Item>
+                                      </Menu.Items>
+                                    </Transition>
+                                  </Menu>
                                   <span className="text-md font-medium text-lime-600">
                                     {favorite.product.name}
                                   </span>
@@ -128,7 +142,7 @@ const Favorites: NextPage = withPageAuthRequired(({ user }) => {
                                   ))}
                                 </div>
                                 <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                                  <ChevronUpIcon
+                                  <ChevronDownIcon
                                     className={classNames(
                                       open ? "rotate-180 transform" : "",
                                       "h-5 w-5 text-gray-500 group-hover:text-white"

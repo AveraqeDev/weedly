@@ -3,13 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BellIcon,
+  ChatAltIcon,
+  ChevronDownIcon,
   ClockIcon,
   CogIcon,
+  ExclamationIcon,
   HeartIcon,
   HomeIcon,
   LoginIcon,
   LogoutIcon,
   MenuIcon,
+  QuestionMarkCircleIcon,
   StarIcon,
   ThumbDownIcon,
   UserIcon,
@@ -115,8 +119,11 @@ const Header: React.FC<HeaderProps> = () => {
                           type="button"
                           className="p-1 rounded-full text-lime-600 hover:text-white hover:bg-lime-500 focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-lime-500"
                         >
-                          <span className="sr-only">View notifications</span>
-                          <BellIcon className="h-6 w-6" aria-hidden="true" />
+                          <span className="sr-only">Help</span>
+                          <QuestionMarkCircleIcon
+                            className="h-6 w-6"
+                            aria-hidden="true"
+                          />
                         </Menu.Button>
                       </div>
                       <Transition
@@ -131,13 +138,16 @@ const Header: React.FC<HeaderProps> = () => {
                         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <Menu.Item>
                             {({ active }) => (
-                              <div
+                              <a
                                 className={classNames(
                                   active ? "bg-lime-500 text-white" : "",
                                   "group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
                                 )}
+                                href="https://docs.google.com/forms/d/e/1FAIpQLSdpA3YG97Y6RHCaJ03QYvulkHEHLySrWeHEVBJsrrJLzhZMPg/viewform"
+                                target="_blank"
+                                rel="noreferrer"
                               >
-                                <ClockIcon
+                                <ExclamationIcon
                                   className={classNames(
                                     active
                                       ? "bg-lime-500 text-white"
@@ -146,8 +156,32 @@ const Header: React.FC<HeaderProps> = () => {
                                   )}
                                   aria-hidden="true"
                                 />
-                                <span>Coming Soon</span>
-                              </div>
+                                <span>Submit a Bug</span>
+                              </a>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <a
+                                className={classNames(
+                                  active ? "bg-lime-500 text-white" : "",
+                                  "group flex items-center px-4 py-2 text-sm text-lime-600 hover:text-white hover:bg-lime-500"
+                                )}
+                                href="https://docs.google.com/forms/d/e/1FAIpQLSfpqm_gNytcAR-HZ94R9EI3hDTKstYYVw-scA0hU-FCtD4ccA/viewform"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <ChatAltIcon
+                                  className={classNames(
+                                    active
+                                      ? "bg-lime-500 text-white"
+                                      : "text-lime-600 group-hover:text-white",
+                                    "mr-3 h-6 w-6"
+                                  )}
+                                  aria-hidden="true"
+                                />
+                                <span>Give Feedback</span>
+                              </a>
                             )}
                           </Menu.Item>
                         </Menu.Items>
@@ -157,7 +191,7 @@ const Header: React.FC<HeaderProps> = () => {
                     {/* Profile dropdown */}
                     <Menu as="div" className="ml-3 relative">
                       <div>
-                        <Menu.Button className="bg-white rounded-full flex text-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">
+                        <Menu.Button className="bg-white rounded-full flex text-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-lime-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">
                           <span className="sr-only">Open user menu</span>
                           {user?.picture ? (
                             <Image

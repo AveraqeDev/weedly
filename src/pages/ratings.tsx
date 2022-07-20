@@ -3,7 +3,7 @@ import { Disclosure } from "@headlessui/react";
 import {
   CalendarIcon,
   ChatIcon,
-  ChevronUpIcon,
+  ChevronDownIcon,
   MinusIcon,
 } from "@heroicons/react/outline";
 import type { NextPage } from "next";
@@ -92,7 +92,7 @@ const Ratings: NextPage = withPageAuthRequired(({ user }) => {
                                   ))}
                                 </div>
                                 <Disclosure.Button className="group rounded-full p-1 hover:bg-lime-500 hover:text-white focus:outline-none">
-                                  <ChevronUpIcon
+                                  <ChevronDownIcon
                                     className={classNames(
                                       open ? "rotate-180 transform" : "",
                                       "h-5 w-5 text-gray-500 group-hover:text-white"
